@@ -1,6 +1,6 @@
 package adventofcode2023
 
-import adventofcode2023.day2.Solve
+import adventofcode2023.day3.Solve
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
