@@ -1,6 +1,5 @@
 package adventofcode2023.day6
 
-import java.math.BigInteger
 import kotlin.math.*
 
 object Solve {
@@ -21,9 +20,9 @@ object Solve {
 
 
 fun parse(text: String): List<Race> {
-    val lines = text.trim().lines()
-    val times = lines.first().split(":").elementAt(1).trim().split("\\s+".toRegex()).map(String::toLong)
-    val distances = lines.last().split(":").elementAt(1).trim().split("\\s+".toRegex()).map(String::toLong)
+    val (first, second) = text.trim().lines()
+    val times = first.split(":").elementAt(1).trim().split("\\s+".toRegex()).map(String::toLong)
+    val distances = second.split(":").elementAt(1).trim().split("\\s+".toRegex()).map(String::toLong)
     return times.zip(distances).map { Race(it.first, it.second) }
 }
 
