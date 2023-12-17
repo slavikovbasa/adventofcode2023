@@ -4,15 +4,29 @@ object Solve {
     const val URL = "https://adventofcode.com/2023/day/5/input"
 
     fun first(text: String): Long {
-        val (seeds, resMaps) = parse(text);
-        return seeds.minOf { matchSeed(it, resMaps) }
+        val (seeds, resMaps) = parse(text)
+        var resource = "seed"
+        var nums = seeds
+        while (true) {
+            val resMap = resMaps[resource] ?: break
+            resource = resMap.resourceTo
+            nums = nums.map { resMap.matchNum(it) }.sorted()
+        }
+        return nums.first()
     }
 
     fun second(text: String): Long {
-        val (seedValues, resMaps) = parse(text);
+        val (seedValues, resMaps) = parse(text)
         val seeds = seedValues.chunked(2).map { it.first()..<it.first() + it.last() }
 
-        return minSeedLocation(seeds, resMaps)
+        var resource = "seed"
+        var ranges = seeds
+        while (true) {
+            val resMap = resMaps[resource] ?: break
+            resource = resMap.resourceTo
+            ranges = ranges.flatMap { resMap.match(it) }.sortedBy { it.first }
+        }
+        return ranges.first().first
     }
 }
 
@@ -27,7 +41,7 @@ fun parse(text: String): Pair<List<Long>, Map<String, ResourceMap>> {
 
     lines.next()
 
-    val resMaps = mutableMapOf<String, ResourceMap>();
+    val resMaps = mutableMapOf<String, ResourceMap>()
     while (lines.hasNext()) {
         val resMap = ResourceMap(lines)
         resMaps[resMap.resourceFrom] = resMap
@@ -44,10 +58,10 @@ class RangeMap(val src: LongRange, private val dst: LongRange) {
 
     fun match(range: LongRange): Triple<LongRange, LongRange, LongRange> {
         val srcRanges = splitRange(range, src)
-        val dstStart = (srcRanges.second.first - src.first) + dst.first
-        val dstRange =
-                dstStart..(srcRanges.second.last - srcRanges.second.first) + dstStart
-        return Triple(srcRanges.first, dstRange, srcRanges.third)
+        val dstStart = srcRanges.second.first - src.first + dst.first
+        val dstEnd = srcRanges.second.last - src.first + dst.first
+
+        return Triple(srcRanges.first, dstStart..dstEnd, srcRanges.third)
     }
 }
 
@@ -62,24 +76,18 @@ class ResourceMap(val resourceFrom: String, val resourceTo: String, private val 
 
     fun match(range: LongRange): List<LongRange> {
         val result = mutableListOf<LongRange>()
-        var last = range;
-        for (r in rangeMaps) {
-            if (last.isEmpty()) {
+        var nextRange = range
+        for (map in rangeMaps) {
+            if (nextRange.isEmpty()) {
                 break
             }
-            val (first, second, third) = r.match(last)
-            if (!first.isEmpty()) {
-                result.add(first)
-            }
-            if (!second.isEmpty()) {
-                result.add(second)
-            }
-            last = third
+            val (first, second, third) = map.match(nextRange)
+            result.add(first)
+            result.add(second)
+            nextRange = third
         }
-        if (!last.isEmpty()) {
-            result.add(last)
-        }
-        return result
+        result.add(nextRange)
+        return result.filter { !it.isEmpty() }
     }
 }
 
@@ -95,28 +103,6 @@ fun ResourceMap(lines: Iterator<String>): ResourceMap {
         parts.add(RangeMap(line))
     }
     return ResourceMap(from, to, parts.sortedBy { it.src.first })
-}
-
-fun minSeedLocation(seedRanges: List<LongRange>, resMaps: Map<String, ResourceMap>): Long {
-    var resource = "seed";
-    var ranges = seedRanges;
-    while (true) {
-        val resMap = resMaps[resource] ?: break
-        resource = resMap.resourceTo
-        ranges = ranges.flatMap { resMap.match(it) }.sortedBy { it.first }
-    }
-    return ranges.first().first
-}
-
-fun matchSeed(i: Long, resMaps: Map<String, ResourceMap>): Long {
-    var resource = "seed";
-    var num = i;
-    while (true) {
-        val resMap = resMaps[resource] ?: break
-        resource = resMap.resourceTo
-        num = resMap.matchNum(num)
-    }
-    return num
 }
 
 fun splitRange(range: LongRange, by: LongRange): Triple<LongRange, LongRange, LongRange> {

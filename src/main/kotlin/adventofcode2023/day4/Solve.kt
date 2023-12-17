@@ -9,7 +9,7 @@ object Solve {
 
     fun second(text: String): Int {
         val cardsPoints = text.trim().lines().map { Card(it).numMatching }
-        val cardsNum = Array<Int>(cardsPoints.size) { 1 }
+        val cardsNum = Array(cardsPoints.size) { 1 }
         for ((index, value) in cardsPoints.withIndex()) {
             for (i in 1..value) {
                 cardsNum[index + i] += cardsNum[index]

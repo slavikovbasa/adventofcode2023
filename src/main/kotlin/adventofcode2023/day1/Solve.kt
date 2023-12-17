@@ -45,8 +45,8 @@ fun getFirstDigit(line: String): Int? = if (line[0].isDigit()) {
 }
 
 fun digitsFromLineComplex(line: String): Int {
-    var first: Int? = null;
-    var last: Int? = null;
+    var first: Int? = null
+    var last: Int? = null
     for (i in line.indices) {
         last = getFirstDigit(line.substring(i)) ?: continue
         first = first ?: last
