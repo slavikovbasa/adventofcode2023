@@ -10,9 +10,9 @@ object Solve {
         while (true) {
             val resMap = resMaps[resource] ?: break
             resource = resMap.resourceTo
-            nums = nums.map { resMap.matchNum(it) }.sorted()
+            nums = nums.map { resMap.matchNum(it) }
         }
-        return nums.first()
+        return nums.min()
     }
 
     fun second(text: String): Long {
@@ -24,9 +24,9 @@ object Solve {
         while (true) {
             val resMap = resMaps[resource] ?: break
             resource = resMap.resourceTo
-            ranges = ranges.flatMap { resMap.match(it) }.sortedBy { it.first }
+            ranges = ranges.flatMap { resMap.match(it) }
         }
-        return ranges.first().first
+        return ranges.minOf { it.first }
     }
 }
 
