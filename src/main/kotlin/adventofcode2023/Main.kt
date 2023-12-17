@@ -1,12 +1,11 @@
 package adventofcode2023
 
-import adventofcode2023.day3.Solve
+import adventofcode2023.day5.Solve
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
 suspend fun main() {
     val text = fetch(Solve.URL)
-
     val elapsed1 = measureTime {
         val res = Solve.first(text)
         println("res1: $res")
