@@ -65,19 +65,24 @@ enum class TYPE {
 
 const val RANKS = "AKQJT98765432"
 
-open class Cards(val value: String) {
-    open val grouped = value.groupBy { it }.map { (key, value) -> Pair(key, value.size) }.toMap()
-    open val ranked = value.map { RANKS.indexOf(it) }.asSequence()
+abstract class CardsBase {
+    abstract val grouped: Map<Char, Int>
+    abstract val ranked: Sequence<Int>
+}
+
+class Cards(value: String) : CardsBase() {
+    override val grouped = value.groupBy { it }.map { (key, value) -> Pair(key, value.size) }.toMap()
+    override val ranked = value.map { RANKS.indexOf(it) }.asSequence()
 }
 
 const val RANKS_JOKER = "AKQT98765432J"
 
-class CardsJokered(value: String) : Cards(value) {
+class CardsJokered(value: String) : CardsBase() {
     override val grouped = groupByJoker(value)
     override val ranked = value.map { RANKS_JOKER.indexOf(it) }.asSequence()
 }
 
-class Hand(val cards: Cards, val bid: Long) : Comparable<Hand> {
+class Hand(private val cards: CardsBase, val bid: Long) : Comparable<Hand> {
     private val typ = TYPE.entries.first { it.match(cards.grouped) }
 
     override operator fun compareTo(other: Hand): Int {
